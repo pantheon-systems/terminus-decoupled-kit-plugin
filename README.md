@@ -1,3 +1,7 @@
+# Terminus Decoupled Kit Plugin
+
+TODO: POC Install instructions.
+
 # Terminus Plugin Example
 
 [![CircleCI](https://circleci.com/gh/pantheon-systems/terminus-plugin-example.svg?style=shield)](https://circleci.com/gh/pantheon-systems/terminus-plugin-example)
