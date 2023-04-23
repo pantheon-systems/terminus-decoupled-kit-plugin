@@ -41,24 +41,36 @@ class DecoupledKitCreateCommand extends CreateCommand implements BuilderAwareInt
     public function createProject($site_name, $label, $options = ['org' => null, 'region' => null, 'cms' => null])
     {
         // TODO:
-        // Install CMS
-        // Call create-decoupled-kit with correct args
         // Run site creation and node commands in parallel
-
-        // $this->log()->notice("Creating {site_name}: {label} on {org}", ['site_name' => $site_name, 'label' => $label, 'org' => $options['org']]);
+        // Update docs with instructions on how to install locally.
 
         $upstreams = [
           'drupal' => 'c76c0e51-ad85-41d7-b095-a98a75869760',
           'wordpress' => 'c9f5e5c0-248f-4205-b63a-d2729572dd1f'
         ];
 
-        $this->create($site_name, $label, $upstreams[strtolower($options['cms'])], ['org' => $options['org']]);
+        $cms = strtolower($options['cms']);
+        $cms_endpont = 'https://dev-' . $site_name . '.pantheonsite.io';
 
-        // Run create pantheon-decoupled-kit interactively. Currently with no
-        // agruments.
-        $this->_exec('npm init pantheon-decoupled-kit@canary');
+        $this->create($site_name, $label, $upstreams[$cms], ['org' => $options['org']]);
 
-        return "Project created!";
+        $this->log()->notice("Installing {cms} on {site_name}", ['cms' => $options['cms'], 'site_name' => $site_name]);
+
+        if ($cms == 'drupal') {
+          $this->_exec('terminus drush ' . $site_name . '.dev -- site-install pantheon_decoupled_profile -y');
+          $this->log()->notice("Now let's create your front-end project...");
+          $this->_exec('npm init pantheon-decoupled-kit@canary -- next-drupal --cmsEndpoint=' . $cms_endpont);
+        }
+
+        if ($cms == 'wordpress') {
+          $this->_exec('terminus wp ' . $site_name . '.dev -- core install --prompt=title,admin_user,admin_email,admin_password');
+          $this->log()->notice("Now let's create your front-end project...");
+          $this->_exec('npm init pantheon-decoupled-kit@canary -- next-wp --cmsEndpoint=' . $cms_endpont);
+        }
+
+        $this->log()->notice("Next steps: import your repository to create a Front-End Site https://docs.pantheon.io/guides/decoupled/no-starter-kit/import-repo");
+
+        return "Your Decoupled Kit project has been created!";
     }
 
     /**
