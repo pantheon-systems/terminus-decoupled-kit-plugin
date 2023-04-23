@@ -1,6 +1,27 @@
 # Terminus Decoupled Kit Plugin
 
-TODO: POC Install instructions.
+Currently a proof of concept.
+
+## Installation
+
+* Clone https://github.com/pantheon-systems/terminus-decoupled-kit-plugin
+* `cd terminus-decoupled-kit-plugin`
+* `composer install`
+* `terminus self:plugin:install .`
+
+## Usage
+
+Run interactively:
+
+```
+terminus decoupled-kit:create
+```
+
+Run with command line flags:
+
+```
+terminus decoupled-kit:create my-site-name "My Site Label" --org="My Org" --cms=drupal
+```
 
 # Terminus Plugin Example
 
