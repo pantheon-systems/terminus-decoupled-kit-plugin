@@ -1,0 +1,9 @@
+.content {
+	display: inherit;
+	margin: var(--10) auto;
+	max-width: var(--lg);
+	min-width: var(--md);
+	color: var(--text-body);
+	font-size: var(--5);
+}
+

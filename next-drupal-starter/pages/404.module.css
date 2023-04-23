@@ -1,0 +1,9 @@
+.errorMessage {
+	display: flex;
+	flex-direction: column;
+	font-size: var(--6);
+}
+
+.errorMessage > span {
+	margin: var(--48) auto 0;
+}
