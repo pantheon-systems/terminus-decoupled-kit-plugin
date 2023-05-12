@@ -55,13 +55,13 @@ class DecoupledKitCreateCommand extends CreateCommand implements BuilderAwareInt
         if ($cms == 'drupal') {
           $this->_exec('terminus drush ' . $site_name . '.dev -- site-install pantheon_decoupled_profile -y');
           $this->log()->notice("Now let's create your front-end project...");
-          $this->_exec('npm init pantheon-decoupled-kit@canary -- next-drupal --cmsEndpoint=' . $cms_endpont);
+          $this->_exec('npm init pantheon-decoupled-kit@canary -- --cmsType drupal --cmsEndpoint=' . $cms_endpont);
         }
 
         if ($cms == 'wordpress') {
           $this->_exec('terminus wp ' . $site_name . '.dev -- core install --prompt=title,admin_user,admin_email,admin_password');
           $this->log()->notice("Now let's create your front-end project...");
-          $this->_exec('npm init pantheon-decoupled-kit@canary -- next-wp --cmsEndpoint=' . $cms_endpont);
+          $this->_exec('npm init pantheon-decoupled-kit@canary -- --cmsType wp --cmsEndpoint=' . $cms_endpont);
         }
 
         $this->log()->notice("Next steps: import your repository to create a Front-End Site https://docs.pantheon.io/guides/decoupled/no-starter-kit/import-repo");
