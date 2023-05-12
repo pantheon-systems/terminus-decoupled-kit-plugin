@@ -8,6 +8,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Robo\Contract\BuilderAwareInterface;
 use Robo\LoadAllTasks;
+use Pantheon\Terminus\Exceptions\TerminusException;
 
 /**
  * Class DecoupledKitCreateCommand.
@@ -33,17 +34,22 @@ class DecoupledKitCreateCommand extends CreateCommand implements BuilderAwareInt
      * @option cms Specify the CMS to use for the site.
      *
      * @usage <site> <label> Creates a new site named <site>, human-readably labeled <label>.
-     * @usage <site> <label> --org=<org> --cms<cms> Creates a new site named <site>, human-readably labeled <label>, associated with <organization>, for the specified <cms>.
+     * @usage <site> <label> --org=<org> --cms<cms> --install-cms<install-cms> Creates a new site named <site>, human-readably labeled <label>, associated with <organization>, for the specified <cms>.
      *
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Pantheon\Terminus\Exceptions\TerminusException
      */
-    public function createProject($site_name, $label, $options = ['org' => null, 'region' => null, 'cms' => null])
+    public function createProject($site_name, $label, $options = ['org' => null, 'region' => null, 'cms' => null, 'install-cms' => TRUE])
     {
         $upstreams = [
           'drupal' => 'c76c0e51-ad85-41d7-b095-a98a75869760',
           'wordpress' => 'c9f5e5c0-248f-4205-b63a-d2729572dd1f'
         ];
+
+        $install_cms = filter_var($options['install-cms'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        if ($install_cms === NULL) {
+          throw new TerminusException('Invalid value: --install-cms must be a boolean.');
+        }
 
         $cms = strtolower($options['cms']);
         $cms_endpont = 'https://dev-' . $site_name . '.pantheonsite.io';
@@ -53,13 +59,13 @@ class DecoupledKitCreateCommand extends CreateCommand implements BuilderAwareInt
         $this->log()->notice("Installing {cms} on {site_name}", ['cms' => $options['cms'], 'site_name' => $site_name]);
 
         if ($cms == 'drupal') {
-          $this->_exec('terminus drush ' . $site_name . '.dev -- site-install pantheon_decoupled_profile -y');
+          $install_cms && $this->_exec('terminus drush ' . $site_name . '.dev -- site-install pantheon_decoupled_profile -y');
           $this->log()->notice("Now let's create your front-end project...");
           $this->_exec('npm init pantheon-decoupled-kit@canary -- next-drupal --cmsEndpoint=' . $cms_endpont);
         }
 
         if ($cms == 'wordpress') {
-          $this->_exec('terminus wp ' . $site_name . '.dev -- core install --prompt=title,admin_user,admin_email,admin_password');
+          $install_cms && $this->_exec('terminus wp ' . $site_name . '.dev -- core install --prompt=title,admin_user,admin_email,admin_password');
           $this->log()->notice("Now let's create your front-end project...");
           $this->_exec('npm init pantheon-decoupled-kit@canary -- next-wp --cmsEndpoint=' . $cms_endpont);
         }
