@@ -20,8 +20,13 @@ terminus decoupled-kit:create
 Run with command line flags:
 
 ```
-terminus decoupled-kit:create my-site-name "My Site Label" --org="My Org" --cms=drupal
+terminus decoupled-kit:create my-site-name "My Site Label" --org="My Org" --cms=drupal --install-cms=FALSE
 ```
+
+If you use the `--install-cms=FALSE` flag, the CMS sites won’t be installed automatically.
+This allows you to install the site with your preferred options. `--install-cms` is an optional flag,
+if it’s not provided, the default value is `TRUE`.
+
 
 # Terminus Plugin Example
 
