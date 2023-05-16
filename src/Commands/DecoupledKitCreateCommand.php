@@ -66,6 +66,8 @@ class DecoupledKitCreateCommand extends CreateCommand implements BuilderAwareInt
 
         if ($cms == 'wordpress') {
           $install_cms && $this->_exec('terminus wp ' . $site_name . '.dev -- core install --prompt=title,admin_user,admin_email,admin_password');
+          $install_cms && $this->_exec('terminus wp ' . $site_name . '.dev rewrite structure \'/%postname%/\'');
+          $install_cms && $this->_exec('terminus wp ' . $site_name . '.dev pantheon cache purge-all --no-interaction');
           $this->log()->notice("Now let's create your front-end project...");
           $this->_exec('npm init pantheon-decoupled-kit@canary -- --cmsType wp --cmsEndpoint=' . $cms_endpont);
         }
