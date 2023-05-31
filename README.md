@@ -26,9 +26,11 @@ terminus decoupled-kit:create
 Run with command line flags:
 
 ```
-terminus decoupled-kit:create my-site-name "My Site Label" --org="My Org" --cms=drupal --install-cms=TRUE
+terminus decoupled-kit:create my-site-name "My Site Label" --org="My Org" --cms=drupal --install-cms=TRUE --region=us
 ```
 
-If you use the `--install-cms=FALSE` flag, the CMS sites won’t be installed automatically.
+If you use the `--install-cms=FALSE` flag, the CMS sites won't be installed automatically.
 This allows you to install the site with your preferred options. `--install-cms` is an optional flag,
-if it’s not provided, the default value is `TRUE`.
+if it's not provided, the default value is `TRUE`.
+
+The `--region` option is also optional. Please refer to the documentation for a list of [valid regions](https://docs.pantheon.io/regions#create-a-new-site-in-a-specific-region-using-terminus).

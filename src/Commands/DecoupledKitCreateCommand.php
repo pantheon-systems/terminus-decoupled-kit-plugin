@@ -34,7 +34,7 @@ class DecoupledKitCreateCommand extends CreateCommand implements BuilderAwareInt
      * @option cms Specify the CMS to use for the site.
      *
      * @usage <site> <label> Creates a new site named <site>, human-readably labeled <label>.
-     * @usage <site> <label> --org=<org> --cms<cms> --install-cms<install-cms> Creates a new site named <site>, human-readably labeled <label>, associated with <organization>, for the specified <cms>.
+     * @usage <site> <label> --org=<org> --cms<cms> --install-cms<install-cms> --region<region> Creates a new site named <site>, human-readably labeled <label>, associated with <organization>, for the specified <cms>.
      *
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Pantheon\Terminus\Exceptions\TerminusException
@@ -54,7 +54,7 @@ class DecoupledKitCreateCommand extends CreateCommand implements BuilderAwareInt
         $cms = strtolower($options['cms']);
         $cms_endpont = 'https://dev-' . $site_name . '.pantheonsite.io';
 
-        $this->create($site_name, $label, $upstreams[$cms], ['org' => $options['org']]);
+        $this->create($site_name, $label, $upstreams[$cms], ['org' => $options['org'], 'region' => strtolower($options['region'])]);
 
         $this->log()->notice("Installing {cms} on {site_name}", ['cms' => $options['cms'], 'site_name' => $site_name]);
 
