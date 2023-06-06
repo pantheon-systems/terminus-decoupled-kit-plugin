@@ -41,17 +41,9 @@ class DecoupledKitCreateCommand extends CreateCommand implements BuilderAwareInt
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Pantheon\Terminus\Exceptions\TerminusException
      */
-    public function createProject($site_name, $label, $upstream_id, $options = ['org' => null, 'region' => null, 'cms' => null, 'install-cms' => TRUE])
+    public function createProject($site_name, $label, $upstream_id = null, $options = ['org' => null, 'region' => null, 'cms' => null, 'install-cms' => TRUE])
     {
-        if(empty($upstream_id)) {
-            $upstreams = [
-                'drupal' => 'c76c0e51-ad85-41d7-b095-a98a75869760',
-                'wordpress' => 'c9f5e5c0-248f-4205-b63a-d2729572dd1f'
-            ];
-            $upstream_id = $upstreams[$cms];
-        }
         
-
         $install_cms = filter_var($options['install-cms'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
         if ($install_cms === NULL) {
           throw new TerminusException('Invalid value: --install-cms must be a boolean.');
@@ -60,7 +52,17 @@ class DecoupledKitCreateCommand extends CreateCommand implements BuilderAwareInt
         $cms = strtolower($options['cms']);
         $cms_endpont = 'https://dev-' . $site_name . '.pantheonsite.io';
 
-        $this->create($site_name, $label, $upstream_id, ['org' => $options['org'], 'region' => strtolower($options['region'])]);
+        if(empty($upstream_id)) {
+          $upstreams = [
+              'drupal' => 'c76c0e51-ad85-41d7-b095-a98a75869760',
+              'wordpress' => 'c9f5e5c0-248f-4205-b63a-d2729572dd1f'
+          ];
+          $upstream_id = $upstreams[$cms];
+        }
+
+        $region = $options['region'] && strtolower($options['region']);
+
+        $this->create($site_name, $label, $upstream_id, ['org' => $options['org'], 'region' => $region]);
 
         $this->log()->notice("Installing {cms} on {site_name}", ['cms' => $options['cms'], 'site_name' => $site_name]);
 
