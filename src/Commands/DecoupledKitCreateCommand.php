@@ -28,24 +28,22 @@ class DecoupledKitCreateCommand extends CreateCommand implements BuilderAwareInt
      *
      * @param string $site_name Site name
      * @param string $label Site label
+     * @param string $upstream_id Upstream name or UUID
+     *
      * @option org Organization name, label, or ID
      * @option region Specify the service region where the site should be
      *   created. See documentation for valid regions.
      * @option cms Specify the CMS to use for the site.
      *
-     * @usage <site> <label> Creates a new site named <site>, human-readably labeled <label>.
-     * @usage <site> <label> --org=<org> --cms<cms> --install-cms<install-cms> Creates a new site named <site>, human-readably labeled <label>, associated with <organization>, for the specified <cms>.
+     * @usage <site> <label> <upstream> Creates a new site named <site>, human-readably labeled <label>, using code from <upstream>.
+     * @usage <site> <label> <upstream> --org=<org> --cms<cms> --install-cms<install-cms> --region<region> Creates a new site named <site>, human-readably labeled <label>, associated with <organization>, for the specified <cms>.
      *
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Pantheon\Terminus\Exceptions\TerminusException
      */
-    public function createProject($site_name, $label, $options = ['org' => null, 'region' => null, 'cms' => null, 'install-cms' => TRUE])
+    public function createProject($site_name, $label, $upstream_id = null, $options = ['org' => null, 'region' => null, 'cms' => null, 'install-cms' => TRUE])
     {
-        $upstreams = [
-          'drupal' => 'c76c0e51-ad85-41d7-b095-a98a75869760',
-          'wordpress' => 'c9f5e5c0-248f-4205-b63a-d2729572dd1f'
-        ];
-
+        
         $install_cms = filter_var($options['install-cms'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
         if ($install_cms === NULL) {
           throw new TerminusException('Invalid value: --install-cms must be a boolean.');
@@ -54,7 +52,17 @@ class DecoupledKitCreateCommand extends CreateCommand implements BuilderAwareInt
         $cms = strtolower($options['cms']);
         $cms_endpont = 'https://dev-' . $site_name . '.pantheonsite.io';
 
-        $this->create($site_name, $label, $upstreams[$cms], ['org' => $options['org']]);
+        if(empty($upstream_id)) {
+          $upstreams = [
+              'drupal' => 'c76c0e51-ad85-41d7-b095-a98a75869760',
+              'wordpress' => 'c9f5e5c0-248f-4205-b63a-d2729572dd1f'
+          ];
+          $upstream_id = $upstreams[$cms];
+        }
+
+        $region = $options['region'] && strtolower($options['region']);
+
+        $this->create($site_name, $label, $upstream_id, ['org' => $options['org'], 'region' => $region]);
 
         $this->log()->notice("Installing {cms} on {site_name}", ['cms' => $options['cms'], 'site_name' => $site_name]);
 
