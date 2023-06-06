@@ -52,12 +52,30 @@ class DecoupledKitCreateCommand extends CreateCommand implements BuilderAwareInt
         $cms = strtolower($options['cms']);
         $cms_endpont = 'https://dev-' . $site_name . '.pantheonsite.io';
 
+        $cms_type = '';
+        $upstream = '';
+        switch ($cms) {
+            case 'd10':
+            case 'drupal':
+            case 'drupal 10':
+                $cms_type = 'd10';
+                $upstream = 'decoupled-drupal-10-composer-managed';
+                break;
+            case 'd9':
+            case 'drupal 9':
+                $cms_type = 'd9';
+                $upstream = 'drupal-composer-managed';
+                break;
+            case 'wordpress':
+            case 'wp':
+                $cms_type = 'wp';
+                $upstream = 'wordpress';
+                break;
+            default:
+                throw new TerminusException('Invalid value: --cms only accepts the values drupal, wordpress, wp, d9, or d10.');
+      }
         if(empty($upstream_id)) {
-          $upstreams = [
-              'drupal' => 'c76c0e51-ad85-41d7-b095-a98a75869760',
-              'wordpress' => 'c9f5e5c0-248f-4205-b63a-d2729572dd1f'
-          ];
-          $upstream_id = $upstreams[$cms];
+            $upstream_id = $upstream;
         }
 
         $region = $options['region'] && strtolower($options['region']);
@@ -69,7 +87,6 @@ class DecoupledKitCreateCommand extends CreateCommand implements BuilderAwareInt
         if ($cms == 'drupal') {
           $install_cms && $this->_exec('terminus drush ' . $site_name . '.dev -- site-install pantheon_decoupled_profile -y');
           $this->log()->notice("Now let's create your front-end project...");
-          $this->_exec('npm init pantheon-decoupled-kit@canary -- --cmsType drupal --cmsEndpoint=' . $cms_endpont);
         }
 
         if ($cms == 'wordpress') {
@@ -77,9 +94,9 @@ class DecoupledKitCreateCommand extends CreateCommand implements BuilderAwareInt
           $install_cms && $this->_exec('terminus wp ' . $site_name . '.dev rewrite structure \'/%postname%/\'');
           $install_cms && $this->_exec('terminus wp ' . $site_name . '.dev pantheon cache purge-all --no-interaction');
           $this->log()->notice("Now let's create your front-end project...");
-          $this->_exec('npm init pantheon-decoupled-kit@canary -- --cmsType wp --cmsEndpoint=' . $cms_endpont);
         }
 
+        $this->_exec('npm init pantheon-decoupled-kit@canary -- --cmsType ' . $cms_type . ' --cmsEndpoint=' . $cms_endpont);
         $this->log()->notice("Next steps: import your repository to create a Front-End Site https://docs.pantheon.io/guides/decoupled/no-starter-kit/import-repo");
 
         return "Your Decoupled Kit project has been created!";
@@ -109,7 +126,7 @@ class DecoupledKitCreateCommand extends CreateCommand implements BuilderAwareInt
           $input->setArgument('label', $label);
         }
         if (!$input->getOption('cms')) {
-          $cms = $this->io()->choice('Choose your CMS back-end', ['Drupal', 'WordPress']);
+          $cms = $this->io()->choice('Choose your CMS back-end', ['Drupal 10', 'Drupal 9', 'WordPress']);
           $input->setOption('cms', $cms);
         }
     }
