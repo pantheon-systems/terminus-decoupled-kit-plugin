@@ -73,12 +73,11 @@ class DecoupledKitCreateCommand extends CreateCommand implements BuilderAwareInt
                 break;
             default:
                 throw new TerminusException('Invalid value: --cms only accepts the values drupal, wordpress, wp, d9, or d10.');
-      }
-        if(empty($upstream_id)) {
-            $upstream_id = $upstream;
         }
+        
+        $upstream_id ??= $upstream;
 
-        $region = $options['region'] && strtolower($options['region']);
+        $region = strtolower($options['region'] ?? '');
 
         $this->create($site_name, $label, $upstream_id, ['org' => $options['org'], 'region' => $region]);
 
