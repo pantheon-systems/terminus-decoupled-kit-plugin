@@ -64,12 +64,12 @@ class DecoupledKitCreateCommand extends CreateCommand implements BuilderAwareInt
             case 'd9':
             case 'drupal 9':
                 $cms_type = 'd9';
-                $upstream = 'drupal-composer-managed';
+                $upstream = 'decoupled-drupal-composer-managed';
                 break;
             case 'wordpress':
             case 'wp':
                 $cms_type = 'wp';
-                $upstream = 'wordpress';
+                $upstream = 'decoupled-wordpress-composer-managed';
                 break;
             default:
                 throw new TerminusException('Invalid value: --cms only accepts the values drupal, wordpress, wp, d9, or d10.');
@@ -84,12 +84,12 @@ class DecoupledKitCreateCommand extends CreateCommand implements BuilderAwareInt
 
         $this->log()->notice("Installing {cms} on {site_name}", ['cms' => $options['cms'], 'site_name' => $site_name]);
 
-        if ($cms == 'drupal') {
+        if ($cms == 'drupal' || $cms == 'd10' || $cms == 'd9' || $cms == 'drupal 9' || $cms == 'drupal 10') {
           $install_cms && $this->_exec('terminus drush ' . $site_name . '.dev -- site-install pantheon_decoupled_profile -y');
           $this->log()->notice("Now let's create your front-end project...");
         }
 
-        if ($cms == 'wordpress') {
+        if ($cms == 'wordpress' || $cms == 'wp') {
           $install_cms && $this->_exec('terminus wp ' . $site_name . '.dev -- core install --prompt=title,admin_user,admin_email,admin_password');
           $install_cms && $this->_exec('terminus wp ' . $site_name . '.dev rewrite structure \'/%postname%/\'');
           $install_cms && $this->_exec('terminus wp ' . $site_name . '.dev pantheon cache purge-all --no-interaction');
