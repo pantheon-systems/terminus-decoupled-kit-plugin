@@ -43,7 +43,6 @@ class DecoupledKitCreateCommand extends CreateCommand implements BuilderAwareInt
      */
     public function createProject($site_name, $label, $upstream_id = null, $options = ['org' => null, 'region' => null, 'cms' => null, 'install-cms' => TRUE])
     {
-        
         $install_cms = filter_var($options['install-cms'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
         if ($install_cms === NULL) {
           throw new TerminusException('Invalid value: --install-cms must be a boolean.');
@@ -71,14 +70,16 @@ class DecoupledKitCreateCommand extends CreateCommand implements BuilderAwareInt
                 $cms_type = 'wp';
                 $upstream = 'decoupled-wordpress-composer-managed';
                 break;
+            case 'any':
+                $cms_type = 'any';
+                break;
             default:
-                throw new TerminusException('Invalid value: --cms only accepts the values drupal, wordpress, wp, d9, or d10.');
-      }
-        if(empty($upstream_id)) {
-            $upstream_id = $upstream;
+                throw new TerminusException('Invalid value: --cms only accepts the values drupal, wordpress, wp, d9, d10 or any.');
         }
 
-        $region = $options['region'] && strtolower($options['region']);
+        $upstream_id ??= $upstream;
+
+        $region = strtolower($options['region'] ?? '');
 
         $this->create($site_name, $label, $upstream_id, ['org' => $options['org'], 'region' => $region]);
 
@@ -125,9 +126,14 @@ class DecoupledKitCreateCommand extends CreateCommand implements BuilderAwareInt
           $label = $this->io()->ask('Choose your site label', 'My Site Label');
           $input->setArgument('label', $label);
         }
-        if (!$input->getOption('cms')) {
+
+        $upstream_arg = $input->getArgument('upstream_id');
+        if (!$input->getOption('cms') && !isset($upstream_arg)) {
           $cms = $this->io()->choice('Choose your CMS back-end', ['Drupal 10', 'Drupal 9', 'WordPress']);
           $input->setOption('cms', $cms);
+        }
+        else {
+          $input->setOption('cms', 'any');
         }
     }
 }
