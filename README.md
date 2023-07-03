@@ -1,47 +1,77 @@
 # Terminus Decoupled Kit Plugin
 
-Creates a Decoupled Kit project for use on Pantheon.
+The Terminus Decoupled Kit Plugin provides commands useful for creating decoupled projects on [Pantheon](https://pantheon.io) using pre-configured starter kits.
 
+The `decoupled-kit:create` command guides you through the following tasks:
+* Creating a new site on Pantheon for the CMS back-end of your choice.
+* Optionally installing your CMS.
+* Creating a front-end codebase that sources data from your newly created CMS project. This codebase will be automatically configured for local development, and can later be deployed to Pantheon using the [import repository workflow](https://docs.pantheon.io/guides/decoupled/no-starter-kit/import-repo).
+
+## Requirements
+* [Terminus](https://docs.pantheon.io/terminus/install)
+* [NodeJS](https://nodejs.org/en/download/)
 ## Installation
 
 ```
-terminus self:plugin:install terminus-build-tools-plugin
+terminus self:plugin:install pantheon-systems/terminus-decoupled-kit-plugin
 ```
 
-Or to install from source:
+## Commands
 
-* Clone https://github.com/pantheon-systems/terminus-decoupled-kit-plugin
-* `cd terminus-decoupled-kit-plugin`
-* `composer install`
-* `terminus self:plugin:install .`
+### decoupled-kit:create
 
-## Usage
+Creates a back-end CMS site on Pantheon and a front-end codebase that sources data from the CMS site.
 
-Run interactively:
+To run interactively:
 
 ```
 terminus decoupled-kit:create
 ```
 
-Run with command line flags:
+#### Command Arguments
+
+The following arguments can be provided to the decoupled-kit:create command:
 
 ```
-terminus decoupled-kit:create my-site-name "My Site Label" --org="My Org" --cms=drupal --install-cms=TRUE --region=us
+decoupled-kit:create [options] [--] <site_name> <label> [<upstream_id>]
 ```
+| Argument    | Description           |
+| ---------   | --------------------- |
+| site_name   | Site name             |
+| label       | Site label            |
+| upstream_id | Upstream name or UUID |
 
-If you use the `--install-cms=FALSE` flag, the CMS sites won't be installed automatically.
-This allows you to install the site with your preferred options. `--install-cms` is an optional flag,
-if it's not provided, the default value is `TRUE`.
 
-The `--region` option is also optional. Please refer to the documentation for a list of [valid regions](https://docs.pantheon.io/regions#create-a-new-site-in-a-specific-region-using-terminus).
-
-If you don't provide an Upstream ID, the value of the --cms option will be used to determine the default Upstream.
-
-### Specifying a Custom Upstream ID
-
-To specify a custom Upstream ID, execute the following command:
+Example:
 
 ```
-terminus decoupled-kit:create my-site-name "My Site Label" decoupled-drupal-10-composer-managed --org="My Org" --cms=drupal --install-cms=FALSE --region=us
+decoupled-kit:create <site> <label> <upstream>
 ```
-Note: Please ensure that the following parameters, `site_name`, `label`, and `upstream_id`, are included in the specified sequence. Placing these parameter values incorrectly may result in their association with the wrong values.
+Creates a new site named `site`, human-readably labeled `label`, using code from `upstream`.
+
+#### Command Options
+
+Additional options are available to further customize the decoupled-kit:create command:
+
+| Option                | Description    |
+| --------------------- | -------------- |
+| --org[=ORG]           | Organization name, label, or ID   |
+| --region[=REGION]     | The region to create the site in. See [the Pantheon regions documentation](https://pantheon.io/docs/regions#create-a-new-site-in-a-specific-region-using-terminus) for details. |
+| --cms[=CMS]           | The CMS to use. Currently supported: drupal, wordpress |
+| --install-cms[=INSTALL-CMS] | Whether to install the CMS. Defaults to true. |
+
+
+Example:
+
+```
+decoupled-kit:create <site> <label> <upstream> --org=<org> --cms<cms> --install-cms<install-cms> --region<region>
+```
+
+Creates a new site named `site`, human-readably labeled `label`, associated with `organization`, for the specified `cms`.
+
+## Related Projects
+
+* [Create Pantheon Decoupled Kit](https://www.npmjs.com/package/create-pantheon-decoupled-kit) - NodeJS CLI used to create and upgrade front-end codebases based on Pantheon starter kits. Used by this terminus plugin and can also be used independently.
+
+## Known Limitations
+* Currently this terminus plugin creates your front-end codebase, but does not automatically deploy it to Pantheon. You can deploy your front-end codebase to Pantheon using the [import repository workflow](https://docs.pantheon.io/guides/decoupled/no-starter-kit/import-repo).
